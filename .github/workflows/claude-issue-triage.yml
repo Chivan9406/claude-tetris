@@ -40,7 +40,7 @@ jobs:
                - `good first issue` — simple, beginner-friendly task
                - `duplicate` — if it seems like a known/repeated problem
 
-            2. **Post a comment** on the issue that includes:
+            2. **Post a comment** on the issue, written in valid GitHub-flavored Markdown (headings, bold text, and bullet lists must render correctly on GitHub), that includes:
                - A brief, friendly summary of what the issue is about (1-2 sentences)
                - A "Formatted Report" section with:
                  - **Type**: Bug / Feature Request / Question / Other

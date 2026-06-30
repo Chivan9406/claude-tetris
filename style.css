@@ -5,14 +5,57 @@
 }
 
 body {
-  background: #0f0f17;
-  color: #e0e0e0;
+  --bg-main: #0f0f17;
+  --text-main: #e0e0e0;
+  --title-color: #7aa2f7;
+  --board-bg: #1a1a25;
+  --board-border: #2a2a3a;
+  --label-color: #555570;
+  --value-color: #7aa2f7;
+  --controls-color: #888;
+  --kbd-bg: #22223a;
+  --kbd-border: #3a3a5a;
+  --kbd-color: #aaa;
+  --overlay-bg: rgba(10, 10, 20, 0.75);
+  --overlay-title-color: #e57373;
+  --restart-bg: #7aa2f7;
+  --restart-color: #0f0f17;
+  --restart-hover: #9bbdff;
+  --toggle-track-bg: #22223a;
+  --toggle-track-border: #3a3a5a;
+  --toggle-thumb-bg: #7aa2f7;
+
+  background: var(--bg-main);
+  color: var(--text-main);
   font-family: system-ui, -apple-system, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   user-select: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+body.light-mode {
+  --bg-main: #f4f4f8;
+  --text-main: #1a1a25;
+  --title-color: #3b5bdb;
+  --board-bg: #ffffff;
+  --board-border: #d0d0dc;
+  --label-color: #6b6b85;
+  --value-color: #3b5bdb;
+  --controls-color: #555566;
+  --kbd-bg: #e8e8f0;
+  --kbd-border: #c5c5d5;
+  --kbd-color: #444455;
+  --overlay-bg: rgba(255, 255, 255, 0.8);
+  --overlay-title-color: #d32f2f;
+  --restart-bg: #3b5bdb;
+  --restart-color: #ffffff;
+  --restart-hover: #5b7ce8;
+  --toggle-track-bg: #d5d8e8;
+  --toggle-track-border: #b5bad5;
+  --toggle-thumb-bg: #3b5bdb;
 }
 
 .wrapper {
@@ -24,7 +67,7 @@ body {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: 10px;
-  color: #7aa2f7;
+  color: var(--title-color);
   margin-bottom: 16px;
   text-shadow: 0 0 20px rgba(122, 162, 247, 0.5);
 }
@@ -37,8 +80,8 @@ body {
 
 #board {
   display: block;
-  border: 1px solid #2a2a3a;
-  background: #1a1a25;
+  border: 1px solid var(--board-border);
+  background: var(--board-bg);
   border-radius: 4px;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
 }
@@ -61,7 +104,7 @@ body {
 .label {
   font-size: 10px;
   letter-spacing: 2px;
-  color: #555570;
+  color: var(--label-color);
   font-weight: 600;
 }
 
@@ -69,14 +112,14 @@ body {
   font-family: 'Courier New', Courier, monospace;
   font-size: 26px;
   font-weight: 700;
-  color: #7aa2f7;
+  color: var(--value-color);
   letter-spacing: 1px;
 }
 
 #next-canvas {
   display: block;
-  border: 1px solid #2a2a3a;
-  background: #1a1a25;
+  border: 1px solid var(--board-border);
+  background: var(--board-bg);
   border-radius: 4px;
 }
 
@@ -90,20 +133,64 @@ body {
 
 .controls li {
   font-size: 12px;
-  color: #888;
+  color: var(--controls-color);
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 kbd {
-  background: #22223a;
-  border: 1px solid #3a3a5a;
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   font-family: inherit;
-  color: #aaa;
+  color: var(--kbd-color);
+}
+
+/* ---- Toggle de tema ---- */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.theme-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--toggle-track-bg);
+  border: 1px solid var(--toggle-track-border);
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.theme-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: var(--toggle-thumb-bg);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.theme-toggle input:checked + .theme-toggle-slider::before {
+  transform: translateX(24px);
 }
 
 /* ---- Overlay ---- */
@@ -113,7 +200,7 @@ kbd {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(10, 10, 20, 0.75);
+  background: var(--overlay-bg);
   backdrop-filter: blur(4px);
   border-radius: 4px;
 }
@@ -134,19 +221,19 @@ kbd {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: 4px;
-  color: #e57373;
+  color: var(--overlay-title-color);
 }
 
 #overlay-score {
   font-family: 'Courier New', Courier, monospace;
   font-size: 14px;
-  color: #7aa2f7;
+  color: var(--value-color);
 }
 
 #restart-btn {
   margin-top: 8px;
-  background: #7aa2f7;
-  color: #0f0f17;
+  background: var(--restart-bg);
+  color: var(--restart-color);
   border: none;
   border-radius: 6px;
   padding: 10px 28px;
@@ -158,5 +245,5 @@ kbd {
 }
 
 #restart-btn:hover {
-  background: #9bbdff;
+  background: var(--restart-hover);
 }

@@ -193,6 +193,54 @@ kbd {
   transform: translateX(24px);
 }
 
+/* ---- Selector de skin ---- */
+.skin-selector {
+  position: fixed;
+  top: 16px;
+  right: 84px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.skin-selector-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--label-color);
+  font-weight: 600;
+}
+
+.skin-selector select {
+  background: var(--toggle-track-bg);
+  border: 1px solid var(--toggle-track-border);
+  color: var(--text-main);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ---- Skin: Neon ---- */
+body.skin-neon #board,
+body.skin-neon #next-canvas {
+  background: #000;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+}
+
+/* ---- Skin: Pastel ---- */
+body.skin-pastel #board,
+body.skin-pastel #next-canvas {
+  background: #fdfaf6;
+}
+
+/* ---- Skin: Pixel art ---- */
+body.skin-pixel #board,
+body.skin-pixel #next-canvas {
+  image-rendering: pixelated;
+}
+
 /* ---- Overlay ---- */
 .overlay {
   position: absolute;

@@ -16,6 +16,19 @@ const COLORS = [
   '#b0bec5', // N - tuerca
 ];
 
+// Muted/lighter variants of COLORS used by the "pastel" skin.
+const PASTEL_COLORS = [
+  null,
+  '#b3e5fc', // I - cyan
+  '#fff59d', // O - yellow
+  '#e1bee7', // T - purple
+  '#c8e6c9', // S - green
+  '#ffcdd2', // Z - red
+  '#bbdefb', // J - pale blue
+  '#ffe0b2', // L - orange
+  '#eceff1', // N - tuerca
+];
+
 const PIECES = [
   null,
   [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], // I
@@ -42,6 +55,7 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggleInput = document.getElementById('theme-toggle-input');
+const skinSelect = document.getElementById('skin-select');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
@@ -64,6 +78,36 @@ themeToggleInput.addEventListener('change', () => {
 });
 
 initTheme();
+
+const SKIN_KEY = 'tetris-skin';
+const SKINS = ['retro', 'neon', 'pastel', 'pixel'];
+let currentSkin = 'retro';
+
+function applySkin(skin) {
+  currentSkin = SKINS.includes(skin) ? skin : 'retro';
+  document.body.classList.remove('skin-neon', 'skin-pastel', 'skin-pixel');
+  if (currentSkin !== 'retro') document.body.classList.add('skin-' + currentSkin);
+  if (skinSelect) skinSelect.value = currentSkin;
+  // Re-render immediately, but only once the game has actually started.
+  if (current) {
+    draw();
+    drawNext();
+  }
+}
+
+function initSkin() {
+  const saved = localStorage.getItem(SKIN_KEY);
+  applySkin(saved || 'retro');
+}
+
+if (skinSelect) {
+  skinSelect.addEventListener('change', () => {
+    localStorage.setItem(SKIN_KEY, skinSelect.value);
+    applySkin(skinSelect.value);
+  });
+}
+
+initSkin();
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -179,20 +223,96 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
-function drawBlock(context, x, y, colorIndex, size, alpha) {
-  if (!colorIndex) return;
-  const color = COLORS[colorIndex];
-  context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
+function roundRectPath(context, rx, ry, rw, rh, radius) {
+  context.beginPath();
+  if (typeof context.roundRect === 'function') {
+    context.roundRect(rx, ry, rw, rh, radius);
+    return;
+  }
+  context.moveTo(rx + radius, ry);
+  context.arcTo(rx + rw, ry, rx + rw, ry + rh, radius);
+  context.arcTo(rx + rw, ry + rh, rx, ry + rh, radius);
+  context.arcTo(rx, ry + rh, rx, ry, radius);
+  context.arcTo(rx, ry, rx + rw, ry, radius);
+  context.closePath();
+}
+
+function drawBlockRetro(context, x, y, colorIndex, size) {
+  context.fillStyle = COLORS[colorIndex];
   context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
   // highlight
   context.fillStyle = 'rgba(255,255,255,0.12)';
   context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+}
+
+function drawBlockNeon(context, x, y, colorIndex, size) {
+  const color = COLORS[colorIndex];
+  context.save();
+  context.shadowColor = color;
+  context.shadowBlur = size * 0.6;
+  context.fillStyle = color;
+  context.fillRect(x * size + 3, y * size + 3, size - 6, size - 6);
+  context.shadowBlur = 0;
+  context.strokeStyle = color;
+  context.lineWidth = 1;
+  context.strokeRect(x * size + 3, y * size + 3, size - 6, size - 6);
+  context.restore();
+}
+
+function drawBlockPastel(context, x, y, colorIndex, size) {
+  const color = PASTEL_COLORS[colorIndex];
+  roundRectPath(context, x * size + 2, y * size + 2, size - 4, size - 4, Math.max(2, size * 0.22));
+  context.fillStyle = color;
+  context.fill();
+  context.strokeStyle = 'rgba(255,255,255,0.5)';
+  context.lineWidth = 1;
+  context.stroke();
+}
+
+function drawBlockPixel(context, x, y, colorIndex, size) {
+  const color = COLORS[colorIndex];
+  const px = x * size + 1;
+  const py = y * size + 1;
+  const s = size - 2;
+  context.fillStyle = color;
+  context.fillRect(px, py, s, s);
+  // checkerboard texture overlay to simulate pixel-art shading
+  const cell = Math.max(2, Math.floor(size / 4));
+  context.fillStyle = 'rgba(0,0,0,0.15)';
+  for (let ry = 0; ry * cell < s; ry++) {
+    for (let rx = 0; rx * cell < s; rx++) {
+      if ((rx + ry) % 2 === 0) continue;
+      const cw = Math.min(cell, s - rx * cell);
+      const ch = Math.min(cell, s - ry * cell);
+      context.fillRect(px + rx * cell, py + ry * cell, cw, ch);
+    }
+  }
+  context.strokeStyle = 'rgba(0,0,0,0.3)';
+  context.lineWidth = 1;
+  context.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1);
+}
+
+function drawBlock(context, x, y, colorIndex, size, alpha) {
+  if (!colorIndex) return;
+  context.globalAlpha = alpha ?? 1;
+  switch (currentSkin) {
+    case 'neon':
+      drawBlockNeon(context, x, y, colorIndex, size);
+      break;
+    case 'pastel':
+      drawBlockPastel(context, x, y, colorIndex, size);
+      break;
+    case 'pixel':
+      drawBlockPixel(context, x, y, colorIndex, size);
+      break;
+    default:
+      drawBlockRetro(context, x, y, colorIndex, size);
+  }
   context.globalAlpha = 1;
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = currentSkin === 'neon' ? 'rgba(255,255,255,0.05)' : '#22222e';
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();

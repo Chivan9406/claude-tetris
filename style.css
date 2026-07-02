@@ -247,3 +247,110 @@ kbd {
 #restart-btn:hover {
   background: var(--restart-hover);
 }
+
+/* ---- Récords / leaderboard ---- */
+.leaderboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.leaderboard-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--board-bg);
+  border: 1px solid var(--board-border);
+}
+
+.leaderboard-row--highlight {
+  border-color: var(--value-color);
+  box-shadow: 0 0 8px rgba(122, 162, 247, 0.5);
+}
+
+.leaderboard-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--value-color);
+}
+
+.leaderboard-score {
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.leaderboard-detail {
+  font-size: 10px;
+  color: var(--label-color);
+}
+
+.leaderboard-empty {
+  font-size: 11px;
+  color: var(--label-color);
+  font-style: italic;
+}
+
+.reset-scores-btn {
+  margin-top: 4px;
+  background: transparent;
+  color: var(--label-color);
+  border: 1px solid var(--board-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.reset-scores-btn:hover {
+  color: var(--value-color);
+  border-color: var(--value-color);
+}
+
+/* ---- Ingreso de nombre (nuevo récord) ---- */
+.name-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.name-entry.hidden {
+  display: none;
+}
+
+.name-entry-row {
+  display: flex;
+  gap: 6px;
+}
+
+#name-input {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--board-border);
+  background: var(--board-bg);
+  color: var(--text-main);
+  width: 120px;
+}
+
+#save-score-btn {
+  background: var(--restart-bg);
+  color: var(--restart-color);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#save-score-btn:hover {
+  background: var(--restart-hover);
+}
